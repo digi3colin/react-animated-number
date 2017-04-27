@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import prettyBytes from 'pretty-bytes';
 import AnimatedNumber from 'react-animated-number';
+import BigNumber from 'bignumber.js';
 
 const getRandomInt = (min, max) => (Math.floor(Math.random() * (max - min + 1)) + min);
 
@@ -13,7 +14,7 @@ class Demo extends Component {
         super();
 
         this.state = {
-            smallValue: 10,
+            smallValue: new BigNumber(10),
             bigValue: 1024,
             updates: 0
         };
@@ -28,7 +29,7 @@ class Demo extends Component {
         const {updates} = this.state;
 
         this.setState({
-            smallValue: getRandomInt(10, 1000),
+            smallValue: new BigNumber(getRandomInt(10, 1000)),
             bigValue: getRandomInt(1024, Math.pow(1024, 4)),
             updates: updates + 1
         });

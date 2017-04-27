@@ -1,13 +1,14 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import raf from 'raf';
+import BigNumber from 'bignumber.js';
 
 const ANIMATION_DURATION: number = 300;
 
 type AnimatedNumberProps = {
     component: any,
     formatValue: ?(n: number) => string,
-    value: number,
+    value: Object | number,
     duration: ?number,
     frameStyle: ?(perc: number) => Object | void,
     stepPrecision: ?number,
@@ -30,7 +31,10 @@ export default class AnimatedNumber extends Component {
     static propTypes = {
         component: PropTypes.any,
         formatValue: PropTypes.func,
-        value: PropTypes.number.isRequired,
+        value: PropTypes.oneOfType([
+            PropTypes.number,
+            PropTypes.instanceOf(BigNumber)
+        ]),
         duration: PropTypes.number,
         frameStyle: PropTypes.func,
         stepPrecision: PropTypes.number,
@@ -53,10 +57,16 @@ export default class AnimatedNumber extends Component {
     }
 
     componentDidMount() {
+        console.log(this.props);
         this.prepareTween(this.props);
     }
 
     componentWillReceiveProps(nextProps: AnimatedNumberProps) {
+
+
+        // if (this.nextProps.value && typeof this.nextProps.value === 'object') {
+        //     this.nextProps.value = this.nextProps.value.toNumber();
+        // }
 
         if (this.state.currentValue === nextProps.value) {
             return;
@@ -82,9 +92,11 @@ export default class AnimatedNumber extends Component {
 
     endTween() {
         raf.cancel(this.tweenHandle);
+        const value = typeof this.props.value === 'object' ?
+            this.props.value.toNumber() : this.props.value;
         this.setState({
             ...this.state,
-            currentValue: this.props.value
+            currentValue: value
         });
     }
 
@@ -102,15 +114,15 @@ export default class AnimatedNumber extends Component {
             return;
         }
 
-        const {value, duration} = this.props;
+        const {duration} = this.props;
+        let {value} = this.props;
+        value = typeof value === 'object' ? value.toNumber() : value;
 
         const {currentValue} = this.state;
         const currentTime = timestamp;
         const startTime = start ? timestamp : this.state.startTime;
         const fromValue = start ? currentValue : this.state.fromValue;
         let newValue;
-
-
 
         if (currentTime - startTime >= duration) {
             newValue = value;
@@ -164,9 +176,12 @@ export default class AnimatedNumber extends Component {
             style = currStyle;
         }
 
+        const title = typeof this.props.value === 'object' ?
+            this.props.value.valueOf() : this.props.value;
+
         return React.createElement(
             this.props.component,
-            {...filterKnownProps(this.props), className, style},
+            {...filterKnownProps(this.props), className, style, title},
             formatValue(adjustedValue)
         );
     }
