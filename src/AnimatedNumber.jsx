@@ -57,17 +57,10 @@ export default class AnimatedNumber extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props);
         this.prepareTween(this.props);
     }
 
     componentWillReceiveProps(nextProps: AnimatedNumberProps) {
-
-
-        // if (this.nextProps.value && typeof this.nextProps.value === 'object') {
-        //     this.nextProps.value = this.nextProps.value.toNumber();
-        // }
-
         if (this.state.currentValue === nextProps.value) {
             return;
         }
